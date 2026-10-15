@@ -35,11 +35,11 @@
 - [x] Tạo Flyway migration ban đầu `V1__init_schema.sql` (bảng `users`, `roles`, `user_roles`, `refresh_tokens`, `user_stats`, `friendships`, `p2p_sessions`, `ai_sessions`)
 
 ### 3. Authentication & Authorization Module (`/api/v1/auth`)
-- [ ] `POST /api/v1/auth/register`: Đăng ký tài khoản mới (mã hóa mật khẩu bằng BCrypt)
-- [ ] `POST /api/v1/auth/login`: Xác thực thông tin, cấp phát Access Token (15 phút) và Refresh Token (7 ngày)
-- [ ] `POST /api/v1/auth/refresh`: Cấp mới Access Token bằng Refresh Token
-- [ ] `POST /api/v1/auth/logout`: Thu hồi token và xóa session
-- [ ] Spring Security Filter Chain bảo vệ các endpoint theo JWT Bearer token
+- [x] `POST /api/v1/auth/register`: Đăng ký tài khoản mới (mã hóa mật khẩu bằng BCrypt, cấp role `ROLE_USER`, khởi tạo `UserStats`)
+- [x] `POST /api/v1/auth/login`: Xác thực thông tin, cấp phát Access Token (15 phút) và Refresh Token (7 ngày)
+- [x] `POST /api/v1/auth/refresh`: Cấp mới Access Token bằng Refresh Token (Refresh Token Rotation)
+- [x] `POST /api/v1/auth/logout`: Thu hồi token và kết thúc session
+- [x] Spring Security Filter Chain bảo vệ các endpoint theo JWT Bearer token (`JwtAuthenticationFilter`)
 
 ### 4. Frontend Scaffolding (`imenglish-frontend`)
 - [ ] Khởi tạo React 18+ với Vite và TypeScript
