@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "c:/Users/Dell/OneDrive/Documents/ImEnglish"],
+      "description": "Access to ImEnglish project files"
+    }
+  }
+}
