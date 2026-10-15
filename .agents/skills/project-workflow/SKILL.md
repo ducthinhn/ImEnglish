@@ -232,3 +232,32 @@ TURN_PASSWORD=password
 VITE_API_BASE_URL=http://localhost:8080/api/v1
 VITE_WS_URL=http://localhost:8080/ws
 ```
+
+---
+
+## 🔄 Phase 0 Sequential Execution Workflow & Reporting Protocol
+
+Mọi công đoạn trong Phase 0 đều phải thực hiện tuần tự theo quy trình dưới đây. **Sau khi hoàn thành từng công đoạn, Agent BẮT BUỘC phải dừng lại kiểm thử và báo cáo chi tiết cho User để được duyệt trước khi chuyển sang công đoạn kế tiếp.**
+
+```
+[Công đoạn 1: Rules & Workflows Setup (.agents/)]  <-- HOÀN THÀNH & ĐANG BÁO CÁO
+                    ↓
+[Công đoạn 2: Backend Scaffolding (Spring Boot 3 + Maven + Base Structure)]
+                    ↓
+[Công đoạn 3: Database & Flyway Migration (PostgreSQL V1 Schema)]
+                    ↓
+[Công đoạn 4: JWT Authentication Module Implementation (/api/v1/auth)]
+                    ↓
+[Công đoạn 5: Frontend Scaffolding (React + Vite + TypeScript + Tailwind)]
+                    ↓
+[Công đoạn 6: Auth UI & Frontend-Backend Integration Testing]
+                    ↓
+[Công đoạn 7: Báo Cáo Nghiệm Thu Phase 0 & Cập Nhật progress/done]
+```
+
+### Tiêu Chuẩn Báo Cáo Từng Công Đoạn (Reporting Standard):
+1. **Nội dung đã làm**: Danh sách file đã tạo hoặc cập nhật.
+2. **Giải thích kỹ thuật**: Vai trò của các component và các quyết định thiết kế.
+3. **Kết quả kiểm thử / Xác thực**: Log lệnh build, compile, trạng thái docker hoặc kết quả test endpoint.
+4. **Đề xuất công đoạn tiếp theo**: Mô tả ngắn gọn việc sẽ làm ở công đoạn tiếp theo và chờ User xác nhận.
+
