@@ -14,8 +14,8 @@
 - [x] Thiết lập hệ thống tài liệu quản lý tiến độ `progress/done` và `progress/upcoming`
 
 ### 2. Backend Scaffolding (`imenglish-backend`)
-- [ ] Khởi tạo Spring Boot 3.x với Java 21 / 17 (Maven/Gradle)
-- [ ] Cấu hình dependencies:
+- [x] Khởi tạo Spring Boot 3.x với Java 17/21 (Maven Wrapper)
+- [x] Cấu hình dependencies:
   - `spring-boot-starter-web`
   - `spring-boot-starter-security`
   - `spring-boot-starter-data-jpa` (PostgreSQL)
@@ -23,15 +23,15 @@
   - `spring-boot-starter-data-redis`
   - `spring-boot-starter-validation`
   - `flyway-core` & `flyway-database-postgresql`
-  - `jjwt-api`, `jjwt-impl`, `jjwt-jackson` (JWT)
-  - `springdoc-openapi-starter-webmvc-ui` (Swagger OpenAPI v3)
+  - `jjwt-api`, `jjwt-impl`, `jjwt-jackson` (JWT 0.12.6)
+  - `springdoc-openapi-starter-webmvc-ui` (Swagger OpenAPI v3 2.5.0)
   - `mapstruct` & `lombok`
-- [ ] Thiết lập kiến trúc phân tầng chuẩn: `controller`, `service`, `repository`, `entity`, `dto`, `exception`, `config`
-- [ ] Tạo cấu trúc chuẩn `ApiResponse<T>`:
+- [x] Thiết lập kiến trúc phân tầng chuẩn: `controller`, `service`, `repository`, `entity`, `dto`, `exception`, `config`
+- [x] Tạo cấu trúc chuẩn `ApiResponse<T>`:
   ```json
   { "success": true, "message": "...", "data": {...}, "errors": [] }
   ```
-- [ ] Viết Global Exception Handler (`@RestControllerAdvice`) xử lý validation, unauthorized, resource not found.
+- [x] Viết Global Exception Handler (`@RestControllerAdvice`) xử lý validation, unauthorized, resource not found.
 - [ ] Tạo Flyway migration ban đầu `V1__init_schema.sql` (bảng `users`, `roles`, `user_roles`, `refresh_tokens`)
 
 ### 3. Authentication & Authorization Module (`/api/v1/auth`)
