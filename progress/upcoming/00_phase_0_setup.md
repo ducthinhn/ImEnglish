@@ -42,16 +42,16 @@
 - [x] Spring Security Filter Chain bảo vệ các endpoint theo JWT Bearer token (`JwtAuthenticationFilter`)
 
 ### 4. Frontend Scaffolding (`imenglish-frontend`)
-- [ ] Khởi tạo React 18+ với Vite và TypeScript
-- [ ] Cấu hình Tailwind CSS, PostCSS, Lucide React icons
-- [ ] Cài đặt các thư viện lõi:
+- [x] Khởi tạo React 18+ với Vite và TypeScript
+- [x] Cấu hình Tailwind CSS, PostCSS, Lucide React icons, Glassmorphism utilities
+- [x] Cài đặt các thư viện lõi:
   - Routing: `react-router-dom`
-  - State management: `zustand`
+  - State management: `zustand` (kèm `persist` middleware)
   - Server state / caching: `@tanstack/react-query`
-  - HTTP Client: `axios` (kèm Interceptor tự động gắn Bearer Token và refresh token khi 401)
+  - HTTP Client: `axios` (kèm Interceptor tự động gắn Bearer Token và silent refresh token khi 401)
   - Form validation: `react-hook-form` + `zod`
-- [ ] Thiết lập Design System cơ bản: Typography, bảng màu HSL, Dark/Light theme token
-- [ ] Xây dựng màn hình Đăng Nhập (`/login`) và Đăng Ký (`/register`) chuẩn responsive, hiệu ứng mượt mà.
+- [x] Thiết lập Design System cơ bản: Typography Inter, bảng màu HSL, Dark theme token
+- [ ] Xây dựng màn hình Đăng Nhập (`/login`) và Đăng Ký (`/register`) chuẩn responsive, kết nối Backend API.
 
 ---
 
