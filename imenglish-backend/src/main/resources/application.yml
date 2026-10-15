@@ -39,7 +39,7 @@ spring:
     # Redis Connection
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
-      port: ${SPRING_DATA_REDIS_PORT:6379}
+      port: ${SPRING_DATA_REDIS_PORT:6380}
       password: ${REDIS_PASSWORD:redis_secret_password}
       timeout: 3000ms
 

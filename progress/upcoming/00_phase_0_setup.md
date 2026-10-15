@@ -32,7 +32,7 @@
   { "success": true, "message": "...", "data": {...}, "errors": [] }
   ```
 - [x] Viết Global Exception Handler (`@RestControllerAdvice`) xử lý validation, unauthorized, resource not found.
-- [ ] Tạo Flyway migration ban đầu `V1__init_schema.sql` (bảng `users`, `roles`, `user_roles`, `refresh_tokens`)
+- [x] Tạo Flyway migration ban đầu `V1__init_schema.sql` (bảng `users`, `roles`, `user_roles`, `refresh_tokens`, `user_stats`, `friendships`, `p2p_sessions`, `ai_sessions`)
 
 ### 3. Authentication & Authorization Module (`/api/v1/auth`)
 - [ ] `POST /api/v1/auth/register`: Đăng ký tài khoản mới (mã hóa mật khẩu bằng BCrypt)
