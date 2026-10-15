@@ -1,0 +1,63 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: imenglish-backend
+
+  # PostgreSQL Datasource
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/imenglish_db}
+    username: ${POSTGRES_USER:imenglish_user}
+    password: ${POSTGRES_PASSWORD:imenglish_secret_password}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA & Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Flyway Migration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
+
+  # MongoDB Connection
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongo_admin:mongo_secret_password@localhost:27017/imenglish_mongo?authSource=admin}
+    # Redis Connection
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redis_secret_password}
+      timeout: 3000ms
+
+# OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+
+# Custom App Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    access-expiration-ms: ${JWT_ACCESS_EXPIRATION_MS:900000}        # 15 minutes
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}    # 7 days
+  cors:
+    allowed-origins: ${CLIENT_URL:http://localhost:5173}
