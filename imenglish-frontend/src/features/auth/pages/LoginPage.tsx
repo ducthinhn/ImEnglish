@@ -114,7 +114,7 @@ export function LoginPage() {
               id="email"
               type="email"
               autoComplete="email"
-              placeholder="alex@example.com"
+              placeholder="dthinh@example.com"
               {...register('email')}
               className={`w-full pl-10 pr-4 py-2.5 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 transition-all focus:outline-none focus:ring-1 ${
                 errors.email

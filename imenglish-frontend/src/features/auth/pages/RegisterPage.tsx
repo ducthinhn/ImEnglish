@@ -388,7 +388,7 @@ export function RegisterPage() {
               <input
                 id="reg-name"
                 type="text"
-                placeholder="Alex Johnson"
+                placeholder="Nguyễn Đức Thịnh"
                 {...register('fullName')}
                 className="w-full px-3 py-2 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
               />
@@ -404,7 +404,7 @@ export function RegisterPage() {
                 <input
                   id="reg-username"
                   type="text"
-                  placeholder="alex_dev"
+                  placeholder="thinh_dev"
                   {...register('username')}
                   className={`w-full pl-9 pr-3 py-2 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 ${
                     errors.username
@@ -431,7 +431,7 @@ export function RegisterPage() {
               <input
                 id="reg-email"
                 type="email"
-                placeholder="alex@example.com"
+                placeholder="dthinh@example.com"
                 {...register('email')}
                 className={`w-full pl-9 pr-3 py-2 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 ${
                   errors.email
