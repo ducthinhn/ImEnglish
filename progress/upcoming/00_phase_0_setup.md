@@ -51,7 +51,7 @@
   - HTTP Client: `axios` (kèm Interceptor tự động gắn Bearer Token và silent refresh token khi 401)
   - Form validation: `react-hook-form` + `zod`
 - [x] Thiết lập Design System cơ bản: Typography Inter, bảng màu HSL, Dark theme token
-- [ ] Xây dựng màn hình Đăng Nhập (`/login`) và Đăng Ký (`/register`) chuẩn responsive, kết nối Backend API.
+- [x] Xây dựng màn hình Đăng Nhập (`/login`) và Đăng Ký (`/register`) chuẩn responsive, kết nối Backend API.
 
 ---
 
