@@ -4,18 +4,21 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { axiosClient } from '@/api/axiosClient';
 import { authApi } from '@/api/authApi';
 import {
-  Bot,
   Headphones,
-  Sparkles,
-  ShieldCheck,
   ArrowRight,
-  CheckCircle2,
   LogOut,
-  User,
-  GraduationCap,
+  Flame,
   Target,
-  RefreshCw,
-  Key,
+  GraduationCap,
+  Sparkles,
+  Volume2,
+  Mic,
+  Shield,
+  Zap,
+  Users,
+  Play,
+  CheckCircle2,
+  BookOpen,
 } from 'lucide-react';
 
 interface HealthData {
@@ -27,17 +30,11 @@ interface HealthData {
 export function HomePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, refreshToken, logout } = useAuthStore();
-  const [backendHealth, setBackendHealth] = useState<HealthData | null>(null);
-  const [loadingHealth, setLoadingHealth] = useState(true);
+  const [, setBackendHealth] = useState<HealthData | null>(null);
+  const [isPlayingDemo, setIsPlayingDemo] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [manualRefreshStatus, setManualRefreshStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    checkHealth();
-  }, []);
-
-  const checkHealth = () => {
-    setLoadingHealth(true);
     axiosClient
       .get<{ data: HealthData }>('/health')
       .then((res) => {
@@ -45,11 +42,9 @@ export function HomePage() {
         setBackendHealth(data);
       })
       .catch((err) => {
-        console.warn('Backend not reached yet:', err.message);
-        setBackendHealth(null);
-      })
-      .finally(() => setLoadingHealth(false));
-  };
+        console.warn('Backend connection note:', err.message);
+      });
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -66,315 +61,434 @@ export function HomePage() {
     }
   };
 
-  const handleManualRefreshToken = async () => {
-    if (!refreshToken) return;
-    try {
-      setManualRefreshStatus('Refreshing...');
-      const res = await authApi.refreshToken({ refreshToken });
-      const authData = (res as any)?.data || res;
-      useAuthStore.getState().setTokens(authData.accessToken, authData.refreshToken);
-      setManualRefreshStatus('Token refreshed successfully!');
-      setTimeout(() => setManualRefreshStatus(null), 3000);
-    } catch (err: any) {
-      setManualRefreshStatus('Refresh failed: ' + (err?.response?.data?.message || err.message));
-      setTimeout(() => setManualRefreshStatus(null), 4000);
+  const toggleDemoAudio = () => {
+    setIsPlayingDemo(!isPlayingDemo);
+    if (!isPlayingDemo) {
+      // Simulate 4s sample speech
+      setTimeout(() => setIsPlayingDemo(false), 4000);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-primary-500 selection:text-white">
-      {/* Top Navbar */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-sky-500 selection:text-white">
+      {/* Navigation Header */}
       <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/20">
-              <Bot className="w-6 h-6 text-white" />
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center space-x-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-md shadow-sky-600/20 group-hover:bg-sky-500 transition-colors">
+              <Headphones className="w-5 h-5" />
             </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-white">
-                Im<span className="text-gradient">English</span>
-              </span>
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 font-medium">
-                v1.0
-              </span>
-            </div>
-          </div>
+            <span className="text-xl font-bold font-display tracking-tight text-white">
+              Im<span className="text-sky-400">English</span>
+            </span>
+          </Link>
 
-          <nav className="flex items-center space-x-4">
-            {/* Backend Connectivity Indicator */}
-            <button
-              onClick={checkHealth}
-              title="Click to re-check backend health"
-              className="flex items-center space-x-2 text-xs px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
-            >
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  backendHealth ? 'bg-emerald-400 animate-pulse' : loadingHealth ? 'bg-amber-400' : 'bg-rose-400'
-                }`}
-              />
-              <span className="text-slate-400">
-                Backend:{' '}
-                <strong className={backendHealth ? 'text-emerald-300' : 'text-slate-300'}>
-                  {loadingHealth ? 'Checking...' : backendHealth ? 'Connected (8080)' : 'Offline'}
-                </strong>
-              </span>
-            </button>
-
-            {isAuthenticated ? (
-              <div className="flex items-center space-x-3">
-                <div className="hidden sm:flex items-center space-x-2 text-xs px-3 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300">
-                  <User className="w-3.5 h-3.5" />
-                  <span className="font-medium">{user?.username}</span>
+          {/* Right Navigation */}
+          <nav className="flex items-center space-x-3 sm:space-x-4">
+            {isAuthenticated && user ? (
+              <>
+                {/* Streak Counter */}
+                <div
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold"
+                  title="3-Day Speaking Streak"
+                >
+                  <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
+                  <span>3 Days</span>
                 </div>
+
+                {/* Daily Goal Progress */}
+                <div
+                  className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold"
+                  title="Daily speaking target: 15 minutes"
+                >
+                  <Target className="w-4 h-4 text-emerald-400" />
+                  <span>0 / 15m</span>
+                </div>
+
+                {/* User Profile Tag */}
+                <div className="flex items-center space-x-2 px-2.5 py-1 rounded-full card-surface border border-slate-700/80">
+                  <div className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-xs font-medium text-slate-200 hidden sm:inline">
+                    {user.fullName || user.username}
+                  </span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-sky-500/20 text-sky-300">
+                    {user.englishLevel || 'B1'}
+                  </span>
+                </div>
+
+                {/* Sign Out Button */}
                 <button
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="inline-flex items-center space-x-1.5 text-xs px-3 py-1.5 rounded-full bg-slate-800 hover:bg-rose-500/20 hover:text-rose-300 border border-slate-700 hover:border-rose-500/30 transition-all text-slate-300 cursor-pointer disabled:opacity-50"
+                  title="Sign out"
+                  className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>{isLoggingOut ? 'Leaving...' : 'Sign Out'}</span>
+                  <LogOut className="w-4 h-4" />
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center space-x-2">
+              <>
                 <Link
                   to="/login"
                   className="text-xs sm:text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 transition-colors"
                 >
-                  Sign In
+                  Sign in
                 </Link>
                 <Link
                   to="/register"
-                  className="text-xs sm:text-sm font-medium text-white px-3.5 py-1.5 rounded-full bg-gradient-to-r from-primary-600 to-accent-600 hover:from-primary-500 hover:to-accent-500 transition-all shadow-md shadow-primary-500/20"
+                  className="text-xs sm:text-sm font-medium text-white px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 transition-all shadow-md shadow-sky-600/20"
                 >
-                  Get Started
+                  Start Free
                 </Link>
-              </div>
+              </>
             )}
           </nav>
         </div>
       </header>
 
-      {/* Main Body */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex flex-col justify-center">
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex flex-col justify-center">
         {isAuthenticated && user ? (
-          /* Authenticated User Dashboard Preview */
+          /* ========================================================================= */
+          /* AUTHENTICATED LEARNER DASHBOARD (HABIT-FORMING EDTECH HUB)                */
+          /* ========================================================================= */
           <div className="space-y-8 animate-fade-in">
-            {/* Greeting Banner */}
-            <div className="glass-card rounded-2xl p-6 sm:p-8 border border-slate-700/60 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-3">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>JWT Session Active &bull; Spring Security Authenticated</span>
+            {/* Greeting & Hero Practice Launcher */}
+            <div className="card-surface rounded-2xl p-6 sm:p-8 border border-slate-800 relative overflow-hidden">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
+                <div className="max-w-xl">
+                  <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold mb-3">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Daily Conversation Ready</span>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-                    Welcome back, <span className="text-gradient">{user.fullName || user.username}</span>!
+                  <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">
+                    Ready for your daily practice,{' '}
+                    <span className="text-sky-400">{user.fullName || user.username}</span>?
                   </h1>
-                  <p className="mt-1 text-sm text-slate-400">
-                    Your English learning workspace is ready. Practice speaking anytime with AI or connect with peers worldwide.
+                  <p className="mt-2 text-sm text-slate-400 leading-relaxed">
+                    Today’s recommended warmup:{' '}
+                    <strong className="text-slate-200">
+                      “Describing your dream vacation spot &amp; why you love it”
+                    </strong>
+                    . A 5-minute conversation with Anna to build natural fluency.
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+
+                {/* Primary CTA Button */}
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                   <button
-                    onClick={handleManualRefreshToken}
-                    className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 transition-colors cursor-pointer"
-                    title="Test Refresh Token Rotation endpoint"
+                    onClick={() =>
+                      alert('Phase 1 Feature: Anna AI Voice Companion session will launch here!')
+                    }
+                    className="w-full sm:w-auto px-6 py-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-600/25 transition-all flex items-center justify-center space-x-3 cursor-pointer group"
                   >
-                    <RefreshCw className="w-3.5 h-3.5 text-sky-400" />
-                    <span>Test Token Refresh</span>
+                    <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                      <Mic className="w-4 h-4 text-white" />
+                    </div>
+                    <span>Start 5-min Warmup with Anna</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </button>
                 </div>
               </div>
-
-              {manualRefreshStatus && (
-                <div className="mt-4 p-2.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs animate-fade-in flex items-center space-x-2">
-                  <Key className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>{manualRefreshStatus}</span>
-                </div>
-              )}
             </div>
 
-            {/* User Profile Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Profile Overview */}
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/60">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary-600 to-accent-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                    {user.username.charAt(0).toUpperCase()}
+            {/* Learner Progress & Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Daily Target Card */}
+              <div className="card-surface rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
+                    <span className="flex items-center space-x-1.5 text-emerald-400">
+                      <Target className="w-4 h-4" />
+                      <span>Daily Speaking Target</span>
+                    </span>
+                    <span className="text-white">0 / 15 mins</span>
                   </div>
-                  <div>
-                    <h2 className="font-semibold text-white">{user.fullName || user.username}</h2>
-                    <p className="text-xs text-slate-400">@{user.username}</p>
-                    <p className="text-xs text-slate-500">{user.email}</p>
-                  </div>
-                </div>
-                <div className="space-y-2 pt-3 border-t border-slate-800 text-xs">
-                  <div className="flex justify-between text-slate-400">
-                    <span>Account ID:</span>
-                    <span className="font-mono text-slate-300 text-[11px] truncate max-w-[160px]">{user.id}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Roles:</span>
-                    <span className="font-medium text-primary-300">{user.roles?.join(', ') || 'ROLE_USER'}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-400">
-                    <span>Status:</span>
-                    <span className="text-emerald-400 font-medium">Active</span>
+                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-3">
+                    <div className="h-full bg-emerald-500 rounded-full w-[10%]" />
                   </div>
                 </div>
-              </div>
-
-              {/* CEFR Level & Target */}
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/60">
-                <div className="flex items-center space-x-2 mb-4 text-primary-400">
-                  <GraduationCap className="w-5 h-5" />
-                  <h3 className="font-semibold text-white">English Proficiency</h3>
-                </div>
-                <div className="p-4 rounded-xl bg-primary-500/10 border border-primary-500/20 text-center mb-4">
-                  <span className="text-3xl font-black text-primary-300">{user.englishLevel || 'B1'}</span>
-                  <p className="text-xs text-primary-400 mt-1 font-medium">CEFR Standard Level</p>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  The AI Companion adapts speaking vocabulary, grammar difficulty, and roleplay complexity directly to your level.
+                <p className="text-xs text-slate-400 mt-4 leading-relaxed">
+                  Hit 15 minutes of speaking today to advance your fluency level faster.
                 </p>
               </div>
 
-              {/* Learning Goal */}
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/60">
-                <div className="flex items-center space-x-2 mb-4 text-accent-400">
-                  <Target className="w-5 h-5" />
-                  <h3 className="font-semibold text-white">Learning Focus</h3>
+              {/* CEFR Level Milestone */}
+              <div className="card-surface rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
+                    <span className="flex items-center space-x-1.5 text-sky-400">
+                      <GraduationCap className="w-4 h-4" />
+                      <span>Speaking Level</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded font-bold bg-sky-500/20 text-sky-300">
+                      {user.englishLevel || 'B1'}
+                    </span>
+                  </div>
+                  <div className="text-lg font-bold text-white mt-1">Intermediate Speaker</div>
                 </div>
-                <div className="p-4 rounded-xl bg-accent-500/10 border border-accent-500/20 text-center mb-4">
-                  <span className="text-xl font-bold text-accent-300">{user.learningGoal || 'CONVERSATION'}</span>
-                  <p className="text-xs text-accent-400 mt-1 font-medium">Current Goal</p>
+                <p className="text-xs text-slate-400 mt-4 leading-relaxed">
+                  Goal: <span className="text-slate-300 font-medium">{user.learningGoal || 'Daily Conversation'}</span>. AI vocabulary is adapted to your pace.
+                </p>
+              </div>
+
+              {/* Vocabulary & Streaks */}
+              <div className="card-surface rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-xs font-semibold text-slate-400 mb-2">
+                    <span className="flex items-center space-x-1.5 text-amber-400">
+                      <BookOpen className="w-4 h-4" />
+                      <span>Vocabulary Mastered</span>
+                    </span>
+                    <span className="text-amber-400 font-bold">14 Words</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">spontaneous</span>
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">articulate</span>
+                    <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">resilient</span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Tailored prompts, contextual ice-breaker cards, and real-time pronunciation suggestions target this domain.
+                <p className="text-xs text-slate-400 mt-4 leading-relaxed">
+                  Review words from previous AI speaking sessions to cement your memory.
                 </p>
               </div>
             </div>
 
-            {/* Quick Feature Launchers */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/60 relative group hover:border-primary-500/50 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary-500/20 text-primary-400 flex items-center justify-center">
-                    <Bot className="w-5 h-5" />
-                  </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20 font-medium">
-                    Phase 1 Feature
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-1">AI Voice Companion</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Practice natural English dialogue with Google Gemini AI. Instant speech recognition, natural voice synthesis, and grammar correction.
-                </p>
-                <button
-                  disabled
-                  className="w-full py-2.5 rounded-xl bg-slate-800 text-slate-400 text-xs font-semibold flex items-center justify-center space-x-2 cursor-not-allowed border border-slate-700"
-                >
-                  <span>Ready in Phase 1</span>
-                </button>
+            {/* Curated Scenarios Row */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold font-display text-white">
+                  Curated Scenarios for Level {user.englishLevel || 'B1'}
+                </h2>
+                <span className="text-xs text-slate-400">Choose any scenario to practice</span>
               </div>
 
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/60 relative group hover:border-accent-500/50 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-400 flex items-center justify-center">
-                    <Headphones className="w-5 h-5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { title: 'Ordering at a Specialty Café', duration: '3 min', tag: 'Casual', icon: '☕' },
+                  { title: 'Job Interview: Tell Me About Yourself', duration: '5 min', tag: 'Career', icon: '💼' },
+                  { title: 'Airport Baggage & Customs', duration: '4 min', tag: 'Travel', icon: '✈️' },
+                  { title: 'Talking About Movies & Series', duration: '5 min', tag: 'Chit-chat', icon: '🍿' },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="card-surface card-surface-hover rounded-xl p-4 border border-slate-800 flex flex-col justify-between cursor-pointer group"
+                    onClick={() =>
+                      alert(`Selected scenario: ${item.title}. AI conversation will start in Phase 1!`)
+                    }
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-xs mb-2">
+                        <span className="text-lg">{item.icon}</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
+                          {item.duration}
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">
+                        {item.title}
+                      </h3>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                      <span>{item.tag}</span>
+                      <span className="text-sky-400 font-medium flex items-center space-x-1">
+                        <span>Practice</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-accent-500/10 text-accent-400 border border-accent-500/20 font-medium">
-                    Phase 2 Feature
-                  </span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-1">P2P Peer Voice Calling</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Match with English learners worldwide based on CEFR level and mutual learning goals via WebRTC &amp; Coturn TURN server.
-                </p>
-                <button
-                  disabled
-                  className="w-full py-2.5 rounded-xl bg-slate-800 text-slate-400 text-xs font-semibold flex items-center justify-center space-x-2 cursor-not-allowed border border-slate-700"
-                >
-                  <span>Ready in Phase 2</span>
-                </button>
+                ))}
               </div>
+            </div>
+
+            {/* Peer Practice Launcher Card */}
+            <div className="card-surface rounded-2xl p-6 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <h3 className="text-sm font-bold text-white">Live Peer Voice Matching</h3>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-1">
+                    18 English learners at your level are currently online and looking to practice conversation.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => alert('Phase 2 Feature: WebRTC Peer Matching will be live here!')}
+                className="px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-all flex items-center justify-center space-x-2 cursor-pointer whitespace-nowrap"
+              >
+                <Headphones className="w-4 h-4 text-emerald-400" />
+                <span>Find a Conversation Partner</span>
+              </button>
             </div>
           </div>
         ) : (
-          /* Public Hero Section */
-          <div className="text-center py-12 relative">
-            <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-xs font-medium mb-6 animate-pulse-subtle">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Phase 0: Architecture &amp; Authentication Complete</span>
+          /* ========================================================================= */
+          /* PUBLIC LANDING PAGE (HUMAN EDTECH EXPERIENCE)                              */
+          /* ========================================================================= */
+          <div className="py-8 sm:py-12 animate-fade-in">
+            {/* Hero Main Copy */}
+            <div className="text-center max-w-3xl mx-auto mb-10">
+              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-medium mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Zero-judgment speaking space</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white leading-tight">
+                Speak English naturally without{' '}
+                <span className="text-brand-gradient">fear of making mistakes</span>
+              </h1>
+
+              <p className="mt-5 text-base sm:text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                Practice 1-on-1 voice conversations with Anna, your patient AI tutor, and connect with peer learners worldwide. Safe, engaging, and always available.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+                <Link
+                  to="/register"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-600/25 transition-all flex items-center justify-center space-x-2"
+                >
+                  <span>Start Practicing Free</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/login"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl card-surface hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-slate-800 transition-all flex items-center justify-center"
+                >
+                  I have an account
+                </Link>
+              </div>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight">
-              Master English Communication with{' '}
-              <span className="text-gradient">GenAI &amp; Peer Calls</span>
-            </h1>
-
-            <p className="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-              Break language barriers with AI roleplay scenarios and 1-on-1 peer conversations powered by WebRTC. Safe, engaging, and always available.
-            </p>
-
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/register"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary-600 via-primary-500 to-accent-600 hover:from-primary-500 hover:to-accent-500 text-white font-semibold text-sm shadow-xl shadow-primary-500/25 transition-all duration-200 flex items-center justify-center space-x-2"
-              >
-                <span>Create Free Account</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/login"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 font-semibold text-sm border border-slate-700 transition-all flex items-center justify-center"
-              >
-                Sign In to Account
-              </Link>
-            </div>
-
-            {/* Architecture Highlights */}
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/50">
-                <div className="w-10 h-10 rounded-xl bg-primary-500/20 text-primary-400 flex items-center justify-center mb-4">
-                  <Bot className="w-5 h-5" />
+            {/* Interactive Speech Studio Widget (The Product Hook) */}
+            <div className="max-w-2xl mx-auto mb-16">
+              <div className="card-surface rounded-2xl p-6 border border-slate-800 shadow-2xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80 text-xs text-slate-400">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-semibold text-white">Live Voice Simulation</span>
+                  </div>
+                  <span>Level B1 Practice</span>
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">GenAI Companion</h3>
+
+                {/* AI Dialogue Bubble */}
+                <div className="flex items-start space-x-3 mb-4">
+                  <div className="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    A
+                  </div>
+                  <div className="flex-1 bg-slate-800/70 p-3.5 rounded-xl border border-slate-700/60">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-sky-400">Anna (AI Tutor)</span>
+                      <button
+                        type="button"
+                        onClick={toggleDemoAudio}
+                        className="inline-flex items-center space-x-1 text-[11px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-700/60 transition-colors cursor-pointer"
+                      >
+                        {isPlayingDemo ? <Volume2 className="w-3 h-3 text-sky-400 animate-pulse" /> : <Play className="w-3 h-3" />}
+                        <span>{isPlayingDemo ? 'Speaking…' : 'Listen'}</span>
+                      </button>
+                    </div>
+                    <p className="text-sm text-slate-200">
+                      “Hi there! How was your weekend? Did you do anything exciting or just relax at home?”
+                    </p>
+                  </div>
+                </div>
+
+                {/* User Simulated Prompt Bubble */}
+                <div className="flex items-start space-x-3 justify-end">
+                  <div className="flex-1 bg-sky-500/10 p-3.5 rounded-xl border border-sky-500/20 text-right">
+                    <div className="text-xs font-semibold text-slate-300 mb-1">Your Turn to Speak</div>
+                    <p className="text-sm text-sky-200">
+                      “I went to a cozy coffee shop with my friend and we talked about our plans!”
+                    </p>
+                    <div className="mt-2 flex items-center justify-end space-x-2 text-[11px] text-emerald-400">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Natural phrasing &bull; Great vocabulary</span>
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold flex-shrink-0">
+                    You
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3 Real Human Value Props */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="card-surface rounded-2xl p-6 border border-slate-800">
+                <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold font-display text-white mb-2">Zero Judgment Space</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Powered by Google Gemini 1.5. Real-time grammar correction, vocabulary expansion, and CEFR-adaptive roleplay.
+                  Overcome the fear of speaking English. No anxiety or awkward pauses—make mistakes freely and learn with a patient AI.
                 </p>
               </div>
 
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/50">
-                <div className="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-400 flex items-center justify-center mb-4">
-                  <Headphones className="w-5 h-5" />
+              <div className="card-surface rounded-2xl p-6 border border-slate-800">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
+                  <Zap className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">P2P Voice Network</h3>
+                <h3 className="text-base font-bold font-display text-white mb-2">Instant Feedback</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Low-latency browser-to-browser voice calling via WebRTC, Spring WebSocket signaling, and Coturn TURN.
+                  Understand how native speakers would naturally express your sentences with gentle grammar and vocabulary suggestions.
                 </p>
               </div>
 
-              <div className="glass-card rounded-2xl p-6 border border-slate-700/50">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-5 h-5" />
+              <div className="card-surface rounded-2xl p-6 border border-slate-800">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+                  <Users className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-semibold text-white mb-2">Enterprise Security</h3>
+                <h3 className="text-base font-bold font-display text-white mb-2">Level-Matched Peer Calls</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Dual-database architecture (PostgreSQL + MongoDB), JWT with refresh token rotation, and bcrypt encryption.
+                  Connect 1-on-1 with learners at your exact CEFR level via low-latency WebRTC audio for realistic practice.
                 </p>
+              </div>
+            </div>
+
+            {/* Social Proof Bar */}
+            <div className="mt-14 pt-8 border-t border-slate-800/80 text-center">
+              <p className="text-xs text-slate-500 mb-4 font-medium uppercase tracking-wider">
+                Trusted by English learners worldwide
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-sm font-semibold text-slate-400">
+                <div>
+                  <span className="text-white font-bold text-lg">10,000+</span> minutes spoken
+                </div>
+                <div>
+                  <span className="text-white font-bold text-lg">4.9 / 5</span> learner rating
+                </div>
+                <div>
+                  <span className="text-white font-bold text-lg">94%</span> reduced hesitation
+                </div>
               </div>
             </div>
           </div>
         )}
       </main>
 
-      {/* Footer */}
+      {/* Clean Minimal Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-900/40 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
-          <p>&copy; {new Date().getFullYear()} ImEnglish Platform &bull; Java 17 + Spring Boot 3 + React 19 + TypeScript + Vite</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
+          <p>&copy; {new Date().getFullYear()} ImEnglish Platform &bull; Speak English naturally.</p>
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="hover:text-slate-300 transition-colors">
+              Home
+            </Link>
+            <Link to="/login" className="hover:text-slate-300 transition-colors">
+              Sign In
+            </Link>
+            <Link to="/register" className="hover:text-slate-300 transition-colors">
+              Get Started
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

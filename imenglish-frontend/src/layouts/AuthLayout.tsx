@@ -1,65 +1,93 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, Sparkles } from 'lucide-react';
+import { Headphones } from 'lucide-react';
 
 interface AuthLayoutProps {
   children?: ReactNode;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  currentStep?: number;
+  totalSteps?: number;
 }
 
-export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+export function AuthLayout({
+  children,
+  title,
+  subtitle,
+  currentStep,
+  totalSteps,
+}: AuthLayoutProps) {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
-      {/* Dynamic ambient background glow */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary-600/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-accent-600/15 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between items-center p-4 sm:p-6 lg:p-8 relative selection:bg-sky-500 selection:text-white">
+      {/* Subtle organic ambient gradient (warm and quiet, not neon) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-80 bg-gradient-to-b from-sky-950/30 to-transparent blur-3xl pointer-events-none" />
 
-      {/* Brand Header */}
-      <div className="mb-8 text-center relative z-10">
+      {/* Top Header */}
+      <header className="w-full max-w-xl mx-auto flex flex-col items-center pt-4 sm:pt-6 relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center space-x-3 group transition-transform duration-200 hover:scale-105"
+          className="inline-flex items-center space-x-2.5 group transition-transform duration-150 hover:opacity-90 mb-4"
         >
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-600 to-accent-500 flex items-center justify-center shadow-xl shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-all duration-300">
-            <Bot className="w-7 h-7 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center text-white shadow-md shadow-sky-600/20">
+            <Headphones className="w-5 h-5 text-white" />
           </div>
-          <span className="text-2xl font-extrabold tracking-tight text-white">
-            Im<span className="text-gradient">English</span>
+          <span className="text-xl font-bold font-display tracking-tight text-white">
+            Im<span className="text-sky-400">English</span>
           </span>
         </Link>
-        <h1 className="mt-4 text-2xl sm:text-3xl font-bold tracking-tight text-white">
-          {title}
-        </h1>
-        <p className="mt-1 text-sm text-slate-400 max-w-sm mx-auto">
-          {subtitle}
-        </p>
-      </div>
 
-      {/* Main Glassmorphism Card */}
-      <main className="w-full max-w-md sm:max-w-lg relative z-10">
-        <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/50 border border-slate-700/60 relative">
-          <div className="absolute top-0 right-0 -mt-2 -mr-2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 text-[10px] font-semibold text-white uppercase tracking-wider flex items-center space-x-1 shadow-md">
-            <Sparkles className="w-3 h-3" />
-            <span>AI Powered</span>
+        {/* Progress Bar (Visible in Multi-step wizard) */}
+        {currentStep && totalSteps && (
+          <div className="w-full max-w-md px-4 mb-4">
+            <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+              <span>Step {currentStep} of {totalSteps}</span>
+              <span className="text-sky-400">
+                {currentStep === 1 && 'Learning Goal'}
+                {currentStep === 2 && 'English Level'}
+                {currentStep === 3 && 'Account Setup'}
+              </span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-sky-500 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+              />
+            </div>
           </div>
+        )}
+
+        <div className="text-center px-4">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-white tracking-tight">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-1 text-sm text-slate-400 max-w-md mx-auto">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </header>
+
+      {/* Main Form Container */}
+      <main className="w-full max-w-lg my-6 relative z-10">
+        <div className="card-surface rounded-2xl p-6 sm:p-8 shadow-2xl border border-slate-800">
           {children}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="mt-8 text-center text-xs text-slate-500 relative z-10">
-        <p>&copy; {new Date().getFullYear()} ImEnglish. Master English with GenAI &amp; P2P Voice.</p>
+      <footer className="w-full py-4 text-center text-xs text-slate-500 relative z-10">
+        <p>&copy; {new Date().getFullYear()} ImEnglish &bull; Speak English naturally with GenAI &amp; peer calls.</p>
         <div className="mt-2 flex justify-center space-x-4">
-          <Link to="/" className="hover:text-slate-400 transition-colors">
+          <Link to="/" className="hover:text-slate-300 transition-colors">
             Home
           </Link>
           <span>&bull;</span>
-          <a href="#" className="hover:text-slate-400 transition-colors">
+          <a href="#" className="hover:text-slate-300 transition-colors">
             Privacy Policy
           </a>
           <span>&bull;</span>
-          <a href="#" className="hover:text-slate-400 transition-colors">
+          <a href="#" className="hover:text-slate-300 transition-colors">
             Terms of Service
           </a>
         </div>
