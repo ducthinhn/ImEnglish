@@ -7,15 +7,20 @@
 @layer base {
   body {
     @apply bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white min-h-screen;
-    background-color: #0b1120; /* Deep Obsidian Slate */
+    background-color: #0b1120;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display tracking-tight text-white;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    @apply tracking-tight text-white;
   }
 }
 
 @layer utilities {
+  .font-display {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
   .card-surface {
     background-color: rgba(15, 23, 42, 0.75);
     border: 1px solid rgba(51, 65, 85, 0.45);

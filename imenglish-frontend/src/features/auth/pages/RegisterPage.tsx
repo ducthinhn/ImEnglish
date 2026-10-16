@@ -106,6 +106,7 @@ export function RegisterPage() {
 
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
@@ -434,12 +435,7 @@ export function RegisterPage() {
                 id="reg-pass"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="At least 8 characters"
-                {...register('password', {
-                  onChange: (e) => {
-                    // Auto-sync confirm password to reduce cognitive friction
-                    setValue('confirmPassword', e.target.value);
-                  },
-                })}
+                {...register('password')}
                 className={`w-full pl-9 pr-9 py-2 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 ${
                   errors.password
                     ? 'border-rose-500 focus:ring-rose-500'
@@ -480,7 +476,39 @@ export function RegisterPage() {
             {errors.password && (
               <p className="mt-1 text-[11px] text-rose-400">{errors.password.message}</p>
             )}
-            <input type="hidden" {...register('confirmPassword')} />
+          </div>
+
+          {/* Confirm Password Field */}
+          <div>
+            <label htmlFor="reg-confirm-pass" className="block text-xs font-medium text-slate-300 mb-1">
+              Confirm password <span className="text-sky-400">*</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Lock className="w-4 h-4" />
+              </div>
+              <input
+                id="reg-confirm-pass"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Re-enter your password"
+                {...register('confirmPassword')}
+                className={`w-full pl-9 pr-9 py-2 rounded-xl input-surface text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 ${
+                  errors.confirmPassword
+                    ? 'border-rose-500 focus:ring-rose-500'
+                    : 'focus:border-sky-500 focus:ring-sky-500'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200"
+              >
+                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="mt-1 text-[11px] text-rose-400">{errors.confirmPassword.message}</p>
+            )}
           </div>
 
           {/* Action Buttons */}
