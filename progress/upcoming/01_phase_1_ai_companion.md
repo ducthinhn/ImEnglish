@@ -7,11 +7,11 @@
 ## 📋 Checklist Công Việc
 
 ### 1. Quản Lý Kịch Bản (Scenarios) & Seed Data
-- [ ] Backend: Thiết kế Scenario Document trong MongoDB
-- [ ] Backend: API `GET /api/v1/ai/scenarios` (lọc theo topic, level A1–C2, search, phân trang)
-- [ ] Backend: API `GET /api/v1/ai/scenarios/{id}`
-- [ ] Data: Chuẩn bị 20+ kịch bản roleplay thực tế (Job Interview, Airport, Restaurant, Casual Chat...)
-- [ ] Frontend: Giao diện chọn kịch bản với thanh tìm kiếm, bộ lọc trình độ và preview thẻ kịch bản trực quan
+- [x] Backend: Thiết kế Scenario Document trong MongoDB (`ScenarioDocument` với đầy đủ role, CEFR level, vocabulary, conversation goals)
+- [x] Backend: API `GET /api/v1/ai/scenarios` (lọc theo topic, level A1–C2, search, phân trang, topics list, featured list)
+- [x] Backend: API `GET /api/v1/ai/scenarios/{id}` (chi tiết kịch bản, system prompt, suggested vocabulary, goals)
+- [x] Data: Chuẩn bị 20+ kịch bản roleplay thực tế (21 kịch bản A1 đến C2 tự động seed vào MongoDB khi ứng dụng khởi chạy)
+- [x] Frontend: Giao diện chọn kịch bản với thanh tìm kiếm, bộ lọc trình độ và preview thẻ kịch bản trực quan (`ScenarioExplorerModal` + tích hợp `HomePage`)
 
 ### 2. Quản Lý Phiên Luyện Tập Với AI (AI Sessions)
 - [ ] Backend: API `POST /api/v1/ai/sessions` (Khởi tạo phiên luyện nói theo kịch bản)

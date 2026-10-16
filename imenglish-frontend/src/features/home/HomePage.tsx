@@ -19,7 +19,12 @@ import {
   Play,
   CheckCircle2,
   BookOpen,
+  Compass,
+  Loader2,
 } from 'lucide-react';
+import { scenarioApi } from '@/api/scenarioApi';
+import type { Scenario } from '@/types/scenario';
+import { ScenarioExplorerModal } from '@/features/scenarios/components/ScenarioExplorerModal';
 
 interface HealthData {
   status: string;
@@ -33,6 +38,9 @@ export function HomePage() {
   const [, setBackendHealth] = useState<HealthData | null>(null);
   const [isPlayingDemo, setIsPlayingDemo] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [featuredScenarios, setFeaturedScenarios] = useState<Scenario[]>([]);
+  const [isLoadingScenarios, setIsLoadingScenarios] = useState(false);
+  const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
   useEffect(() => {
     axiosClient
@@ -45,6 +53,25 @@ export function HomePage() {
         console.warn('Backend connection note:', err.message);
       });
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setIsLoadingScenarios(true);
+      scenarioApi
+        .getFeaturedScenarios(user?.englishLevel, 4)
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setFeaturedScenarios(data);
+          }
+        })
+        .catch((err) => {
+          console.warn('Failed to load featured scenarios:', err);
+        })
+        .finally(() => {
+          setIsLoadingScenarios(false);
+        });
+    }
+  }, [isAuthenticated, user?.englishLevel]);
 
   const handleLogout = async () => {
     try {
@@ -259,48 +286,110 @@ export function HomePage() {
 
             {/* Curated Scenarios Row */}
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-bold font-display text-white">
-                  Curated Scenarios for Level {user.englishLevel || 'B1'}
-                </h2>
-                <span className="text-xs text-slate-400">Choose any scenario to practice</span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                <div>
+                  <h2 className="text-base font-bold font-display text-white">
+                    Curated Scenarios for Level {user.englishLevel || 'B1'}
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Realistic roleplay conversations tailored to your fluency
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsExplorerOpen(true)}
+                  className="inline-flex items-center space-x-1.5 text-xs font-semibold text-sky-400 hover:text-sky-300 transition-colors cursor-pointer bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 rounded-lg border border-sky-500/20 w-fit"
+                >
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>Browse All 20+ Scenarios</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { title: 'Ordering at a Specialty Café', duration: '3 min', tag: 'Casual', icon: '☕' },
-                  { title: 'Job Interview: Tell Me About Yourself', duration: '5 min', tag: 'Career', icon: '💼' },
-                  { title: 'Airport Baggage & Customs', duration: '4 min', tag: 'Travel', icon: '✈️' },
-                  { title: 'Talking About Movies & Series', duration: '5 min', tag: 'Chit-chat', icon: '🍿' },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="card-surface card-surface-hover rounded-xl p-4 border border-slate-800 flex flex-col justify-between cursor-pointer group"
-                    onClick={() =>
-                      alert(`Selected scenario: ${item.title}. AI conversation will start in Phase 1!`)
-                    }
-                  >
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-2">
-                        <span className="text-lg">{item.icon}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
-                          {item.duration}
+              {isLoadingScenarios && featuredScenarios.length === 0 ? (
+                <div className="card-surface rounded-xl p-8 border border-slate-800 text-center flex items-center justify-center space-x-2 text-xs text-slate-400">
+                  <Loader2 className="w-4 h-4 animate-spin text-sky-400" />
+                  <span>Loading scenarios from MongoDB database...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {(featuredScenarios.length > 0
+                    ? featuredScenarios
+                    : [
+                        {
+                          id: 'mock-1',
+                          code: 'mock-1',
+                          title: 'Ordering at a Specialty Café',
+                          estimatedDurationMinutes: 3,
+                          topic: 'Casual',
+                          icon: '☕',
+                          cefrLevel: user.englishLevel || 'B1',
+                          description: 'Order your drink and customize options with the barista.',
+                        },
+                        {
+                          id: 'mock-2',
+                          code: 'mock-2',
+                          title: 'Job Interview: Elevator Pitch',
+                          estimatedDurationMinutes: 5,
+                          topic: 'Career',
+                          icon: '💼',
+                          cefrLevel: user.englishLevel || 'B1',
+                          description: 'Introduce your background and strengths clearly to a recruiter.',
+                        },
+                        {
+                          id: 'mock-3',
+                          code: 'mock-3',
+                          title: 'Airport Baggage & Customs',
+                          estimatedDurationMinutes: 4,
+                          topic: 'Travel',
+                          icon: '✈️',
+                          cefrLevel: user.englishLevel || 'B1',
+                          description: 'Answer questions at immigration and reclaim lost baggage.',
+                        },
+                        {
+                          id: 'mock-4',
+                          code: 'mock-4',
+                          title: 'Talking About Movies & Series',
+                          estimatedDurationMinutes: 5,
+                          topic: 'Chit-chat',
+                          icon: '🍿',
+                          cefrLevel: user.englishLevel || 'B1',
+                          description: 'Share recommendations and your review of a recent movie.',
+                        },
+                      ]
+                  ).map((item, idx) => (
+                    <div
+                      key={(item as any).id || idx}
+                      className="card-surface card-surface-hover rounded-xl p-4 border border-slate-800 flex flex-col justify-between cursor-pointer group"
+                      onClick={() => setIsExplorerOpen(true)}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-2">
+                          <span className="text-xl">{(item as any).icon || '💬'}</span>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
+                            {(item as any).estimatedDurationMinutes || 5} min
+                          </span>
+                        </div>
+                        <h3 className="text-sm font-semibold text-white group-hover:text-sky-300 transition-colors line-clamp-1">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                          {(item as any).description || 'Practice conversational fluency with Anna.'}
+                        </p>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-800/70 text-slate-300">
+                          {(item as any).topic || 'Speaking'}
+                        </span>
+                        <span className="text-sky-400 font-medium flex items-center space-x-1">
+                          <span>Practice</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       </div>
-                      <h3 className="text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">
-                        {item.title}
-                      </h3>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-                      <span>{item.tag}</span>
-                      <span className="text-sky-400 font-medium flex items-center space-x-1">
-                        <span>Practice</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Peer Practice Launcher Card */}
@@ -491,6 +580,17 @@ export function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Scenario Explorer Modal */}
+      <ScenarioExplorerModal
+        isOpen={isExplorerOpen}
+        onClose={() => setIsExplorerOpen(false)}
+        initialLevel={user?.englishLevel}
+        onSelectScenario={(scenario) => {
+          setIsExplorerOpen(false);
+          alert(`Starting roleplay: ${scenario.title} (${scenario.cefrLevel}). Anna AI Companion session initiates in Phase 1 Stage 2!`);
+        }}
+      />
     </div>
   );
 }
