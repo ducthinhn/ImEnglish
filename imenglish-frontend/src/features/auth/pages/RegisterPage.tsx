@@ -148,6 +148,29 @@ export function RegisterPage() {
 
   const strength = getPasswordStrength(passwordValue);
 
+  const passwordCriteria = [
+    {
+      id: 'length',
+      label: 'At least 8 characters',
+      met: (passwordValue || '').length >= 8,
+    },
+    {
+      id: 'uppercase',
+      label: 'At least 1 uppercase letter (A-Z)',
+      met: /[A-Z]/.test(passwordValue || ''),
+    },
+    {
+      id: 'lowercase',
+      label: 'At least 1 lowercase letter (a-z)',
+      met: /[a-z]/.test(passwordValue || ''),
+    },
+    {
+      id: 'number',
+      label: 'At least 1 number (0-9)',
+      met: /\d/.test(passwordValue || ''),
+    },
+  ];
+
   const handleNextFromStep1 = () => {
     setCurrentStep(2);
   };
@@ -450,27 +473,50 @@ export function RegisterPage() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {/* Password Strength Meter */}
+            {/* Password Strength Meter & Interactive Requirements Checklist */}
             {passwordValue && (
-              <div className="mt-2 flex items-center space-x-2">
-                <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden flex space-x-1">
-                  <div
-                    className={`h-full flex-1 rounded-full ${
-                      strength.score >= 1 ? strength.color : 'bg-transparent'
-                    }`}
-                  />
-                  <div
-                    className={`h-full flex-1 rounded-full ${
-                      strength.score >= 2 ? strength.color : 'bg-transparent'
-                    }`}
-                  />
-                  <div
-                    className={`h-full flex-1 rounded-full ${
-                      strength.score >= 3 ? strength.color : 'bg-transparent'
-                    }`}
-                  />
+              <div className="mt-2.5 p-3 rounded-xl card-surface border border-slate-800 space-y-2 animate-fade-in">
+                <div className="flex items-center space-x-2">
+                  <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden flex space-x-1">
+                    <div
+                      className={`h-full flex-1 rounded-full transition-colors ${
+                        strength.score >= 1 ? strength.color : 'bg-transparent'
+                      }`}
+                    />
+                    <div
+                      className={`h-full flex-1 rounded-full transition-colors ${
+                        strength.score >= 2 ? strength.color : 'bg-transparent'
+                      }`}
+                    />
+                    <div
+                      className={`h-full flex-1 rounded-full transition-colors ${
+                        strength.score >= 3 ? strength.color : 'bg-transparent'
+                      }`}
+                    />
+                  </div>
+                  <span className={`text-[10px] font-semibold ${strength.color.replace('bg-', 'text-')}`}>
+                    {strength.label}
+                  </span>
                 </div>
-                <span className="text-[10px] text-slate-400 font-medium">{strength.label}</span>
+
+                {/* Criteria Checklist */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1 text-[11px]">
+                  {passwordCriteria.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center space-x-1.5 transition-colors ${
+                        item.met ? 'text-emerald-400 font-medium' : 'text-slate-400'
+                      }`}
+                    >
+                      {item.met ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                      ) : (
+                        <div className="w-3.5 h-3.5 rounded-full border border-slate-600 flex-shrink-0" />
+                      )}
+                      <span>{item.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
             {errors.password && (
